@@ -1,0 +1,51 @@
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Test Workflow
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout cli bosh release repo
+        uses: actions/checkout@v4
+
+      - name: Run arbitrary command via configured shepherd
+        uses: ./
+        with:
+          debug:        ${{ runner.debug }}
+          api_token:    ${{ secrets.API_TOKEN }}
+          api_endpoint: ${{ vars.API_ENDPOINT }}
+          namespace:    official
+          run: |
+            echo "List all available pools"
+            shepherd list pool --namespace "${NAMESPACE:?}"
+            exit 0
+            echo "Wont reach to this point"
+
+      - name: Claim environment with provided pool_name and pool_namespace
+        id:   claim-env
+        uses: ./
+        with:
+          debug:        ${{ runner.debug }}
+          api_token:    ${{ secrets.API_TOKEN }}
+          api_endpoint: ${{ vars.API_ENDPOINT }}
+          pool_name:      cfd-29
+          pool_namespace: official
+          namespace:      tas-devex
+          duration:       1h
+
+      - name: Print env status
+        run: |
+          jq -r .status lease.json
+
+      - name: Unclaim environment with provided env_id and namespace
+        if:   always()
+        uses: ./
+        with:
+          debug:        ${{ runner.debug }}
+          api_token:    ${{ secrets.API_TOKEN }}
+          api_endpoint: ${{ vars.API_ENDPOINT }}
+          env_id:       ${{ steps.claim-env.outputs.env-id }}
+          namespace:    tas-devex

@@ -1,0 +1,64 @@
+name: GHA Shepherd
+author: Al Berez
+branding:
+  icon: activity
+  color: red
+description: Manage Shepherd environments
+
+inputs:
+  debug:
+    description: Debug logging
+    default:     0
+    required:    false
+  api_token:
+    description: Shepherd API Token
+    required: true
+  api_endpoint:
+    description: Shepherd API Endpoint
+    required:    true
+  env_id:
+    description: If no environment id provided, claim new one
+    required:    false
+  namespace:
+    description: Shepherd Namespace
+    default:     tas-devex
+    required:    false
+  run:
+    description: If configured this will run script and exit
+    required:    false
+  pool_name:
+    description: Shepherd Pool Name
+    required:    false
+  pool_namespace:
+    description: Shepherd Pool Namespace
+    default:     official
+    required:    false
+  duration:
+    description: Duration of the env lease
+    default:     4h
+    required:    false
+  description:
+    description: Description of the new lease
+    default:     "GHA: ${{ github.repository }}"
+
+outputs:
+  env_id:
+    description: If no environment id provided, claim new one
+
+runs:
+  using: docker
+  image: Dockerfile
+  entrypoint: /main.sh
+
+  env:
+    TRACE:          ${{ inputs.debug }}
+    API_ENDPOINT:   ${{ inputs.api_endpoint }}
+    API_TOKEN:      ${{ inputs.api_token }}
+    RUN:            ${{ inputs.run }}
+    ENV_ID:         ${{ inputs.env_id }}
+    NAMESPACE:      ${{ inputs.namespace }}
+    POOL_NAME:      ${{ inputs.pool_name }}
+    POOL_NAMESPACE: ${{ inputs.pool_namespace }}
+    DURATION:       ${{ inputs.duration }}
+    DESCRIPTION:    ${{ inputs.description }}
+  
