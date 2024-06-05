@@ -45,7 +45,8 @@ if [[ -n "${POOL_NAME:-}" ]]; then
     echo "::group::Lease readiness"
     while get_lease > lease.json; do
       status=$(jq -r .status lease.json )
-      echo "[$(date -u +%Y-%m-%dT%H:%M:%S%Z)] Lease status: ${status:?}"
+      environment=$(jq -r --compact-output '.environment' lease.json)
+      echo "[$(date -u +%Y-%m-%dT%H:%M:%S%Z)] Lease status: ${status:?} ${environment}"
 
       [[ "${TRACE:-0}" == "1" ]] && jq -r 'keys[] as $k | "\n\($k): \(.[$k] | tojson)"' lease.json
 
@@ -64,7 +65,7 @@ if [[ -n "${POOL_NAME:-}" ]]; then
     echo "::endgroup::"
   }
 
-  # lease_id="966e8ad2-ff7f-4611-b053-4cd2299927d7" # LEASED
+  # lease_id="96255d59-e240-4215-a022-62ba4126bc18" # LEASED
 
   lease_id=${lease_id:-$(create_lease)}
   echo "env-id=$lease_id" >> "${GITHUB_OUTPUT}"

@@ -36,12 +36,19 @@ jobs:
           namespace:      tas-devex
           duration:       1h
 
+      - name: Upload artifact
+        if:   env.ACTIONS_RUNNER_DEBUG == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: lease-json
+          path: lease.json
+
       - name: Print env details
         run: |
           jq -r 'keys[] as $k | "\n\($k): \(.[$k] | tojson)"' lease.json
 
       - name: Unclaim environment with provided env_id and namespace
-        if:   always()
+        if:   always() && env.ACTIONS_RUNNER_DEBUG != 'true'
         uses: ./
         with:
           debug:        ${{ runner.debug }}

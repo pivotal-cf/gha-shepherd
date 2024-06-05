@@ -32,12 +32,7 @@ run:
 			--var-file    .env \
 			--workflows   .github/workflows/test.yml \
 			--job test \
+			--env ACTIONS_RUNNER_DEBUG=true \
+			--env ACTIONS_RUNTIME_TOKEN=1234 \
+			--artifact-server-path /tmp/artifact \
 			--rm
-
-build-image:
-		act \
-			--actor 			"${GITHUB_USER}" \
-			--secret 		  GITHUB_TOKEN="${GITHUB_TOKEN}" \
-			--secret-file .secrets \
-			--var-file    .env \
-			--workflows   .github/workflows/build-image.yml
