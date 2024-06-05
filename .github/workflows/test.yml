@@ -36,9 +36,9 @@ jobs:
           namespace:      tas-devex
           duration:       1h
 
-      - name: Print env status
+      - name: Print env details
         run: |
-          jq -r .status lease.json
+          jq -r 'keys[] as $k | "\n\($k): \(.[$k] | tojson)"' lease.json
 
       - name: Unclaim environment with provided env_id and namespace
         if:   always()

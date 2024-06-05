@@ -34,29 +34,21 @@ if [[ -n "${POOL_NAME:-}" ]]; then
 
   get_lease() {
     shepherd get lease "${lease_id:?}" \
-      --namespace tas-devex \
+      --namespace "${NAMESPACE:?}" \
       --json \
       | jq -r \
           --sort-keys \
           --compact-output
   }
 
-  get_lease_status() {
-    get_lease \
-      | jq -r .status
-  }
-
-  get_lease_output() {
-    get_lease \
-      | jq -r .output \
-           --sort-keys \
-           --compact-output
-  }
-
   wait_until_env_is_ready() {
     echo "::group::Lease readiness"
-    while status=$(get_lease_status); do
+    while get_lease > lease.json; do
+      status=$(jq -r .status lease.json )
       echo "[$(date -u +%Y-%m-%dT%H:%M:%S%Z)] Lease status: ${status:?}"
+
+      [[ "${TRACE:-0}" == "1" ]] && jq -r 'keys[] as $k | "\n\($k): \(.[$k] | tojson)"' lease.json
+
       case ${status} in
         LEASED)
           exit 0
@@ -72,14 +64,10 @@ if [[ -n "${POOL_NAME:-}" ]]; then
     echo "::endgroup::"
   }
 
-  # lease_id="63588369-ea60-422a-b4b9-9a1b2ada031c" # LEASED
+  # lease_id="966e8ad2-ff7f-4611-b053-4cd2299927d7" # LEASED
 
   lease_id=${lease_id:-$(create_lease)}
   echo "env-id=$lease_id" >> "${GITHUB_OUTPUT}"
 
-  get_lease > lease.json
-
   time wait_until_env_is_ready
-
-  get_lease > lease.json
 fi
