@@ -15,7 +15,7 @@ repo-context-cleanup-secrets:
 
 repo-context-set-vars:
 	gh variable ${GH_ARGS} list
-	gh variable ${GH_ARGS} set -f .env
+	gh variable ${GH_ARGS} set -f .vars
 	gh variable ${GH_ARGS} list
 
 repo-context-set-secrets:
@@ -29,10 +29,9 @@ run:
 			--actor 			"${GITHUB_USER}" \
 			--secret 		  GITHUB_TOKEN="${GITHUB_TOKEN}" \
 			--secret-file .secrets \
-			--var-file    .env \
+			--var-file    .vars \
 			--workflows   .github/workflows/test.yml \
-			--job test \
-			--env ACTIONS_RUNNER_DEBUG=true \
-			--env ACTIONS_RUNTIME_TOKEN=1234 \
+			--job         test \
+			--env         ACTIONS_RUNNER_DEBUG=true \
 			--artifact-server-path /tmp/artifact \
 			--rm
