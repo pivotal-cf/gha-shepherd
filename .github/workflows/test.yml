@@ -14,6 +14,7 @@ jobs:
       - name: Run arbitrary command via configured shepherd
         uses: ./
         with:
+          command:      shell
           debug:        ${{ runner.debug }}
           api_token:    ${{ secrets.API_TOKEN }}
           api_endpoint: ${{ vars.API_ENDPOINT }}
@@ -24,20 +25,32 @@ jobs:
             exit 0
             echo "Wont reach to this point"
 
-      - name: Claim environment with provided pool_name and pool_namespace
-        id:   claim-env
+      - name: Create environment with provided pool_name and pool_namespace
+        id:   create-env
+        if:   ${{ !vars.ENV_ID }}
         uses: ./
         with:
-          debug:        ${{ runner.debug }}
-          api_token:    ${{ secrets.API_TOKEN }}
-          api_endpoint: ${{ vars.API_ENDPOINT }}
-          pool_name:      cfd-29
-          pool_namespace: official
+          command:         create
+          debug:           ${{ runner.debug }}
+          api_token:       ${{ secrets.API_TOKEN }}
+          api_endpoint:    ${{ vars.API_ENDPOINT }}
+          pool_name:       cfd
+          pool_namespace:  official
+          namespace:       tas-devex
+          duration:        15m
+
+      - name: Get running env metadata
+        uses: ./
+        with:
+          command:        get
+          debug:          ${{ runner.debug }}
+          api_token:      ${{ secrets.API_TOKEN }}
+          api_endpoint:   ${{ vars.API_ENDPOINT }}
+          env_id:         ${{ vars.ENV_ID || steps.create-env.outputs.env-id }}
           namespace:      tas-devex
-          duration:       1h
+          env_file_path:  ./lease.json
 
       - name: Upload artifact
-        if:   env.ACTIONS_RUNNER_DEBUG == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: lease-json
@@ -47,12 +60,13 @@ jobs:
         run: |
           jq -r 'keys[] as $k | "\n\($k): \(.[$k] | tojson)"' lease.json
 
-      - name: Unclaim environment with provided env_id and namespace
-        if:   always() && env.ACTIONS_RUNNER_DEBUG != 'true'
+      - name: Delete lease with provided env_id and namespace
+        if:   ${{ always() && !vars.ENV_ID }}
         uses: ./
         with:
+          command:      delete
           debug:        ${{ runner.debug }}
           api_token:    ${{ secrets.API_TOKEN }}
           api_endpoint: ${{ vars.API_ENDPOINT }}
-          env_id:       ${{ steps.claim-env.outputs.env-id }}
+          env_id:       ${{ steps.create-env.outputs.env-id }}
           namespace:    tas-devex

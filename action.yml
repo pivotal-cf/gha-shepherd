@@ -9,41 +9,40 @@ inputs:
   debug:
     description: Debug logging
     default:     0
-    required:    false
   api_token:
     description: Shepherd API Token
-    required: true
+    required:    true
   api_endpoint:
     description: Shepherd API Endpoint
     required:    true
+  command:
+    description: Supports shell (default), create, get, delete
+    required:    true
+  run:
+    description: Execute this shell script within authenticated shepherd context
   env_id:
     description: If no environment id provided, claim new one
-    required:    false
   namespace:
     description: Shepherd Namespace
     default:     tas-devex
-    required:    false
-  run:
-    description: If configured this will run script and exit
-    required:    false
   pool_name:
     description: Shepherd Pool Name
-    required:    false
   pool_namespace:
     description: Shepherd Pool Namespace
     default:     official
-    required:    false
   duration:
     description: Duration of the env lease
     default:     4h
-    required:    false
   description:
     description: Description of the new lease
     default:     "GHA: ${{ github.repository }}"
+  env_file_path:
+    description: Location of the JSON env file
+    default:     ./lease_env.json
 
 outputs:
   env_id:
-    description: If no environment id provided, claim new one
+    description: Lease ID produced by create command
 
 runs:
   using: docker
@@ -51,14 +50,16 @@ runs:
   entrypoint: /main.sh
 
   env:
-    TRACE:          ${{ inputs.debug }}
     API_ENDPOINT:   ${{ inputs.api_endpoint }}
     API_TOKEN:      ${{ inputs.api_token }}
-    RUN:            ${{ inputs.run }}
+    COMMAND:        ${{ inputs.command }}
+    DESCRIPTION:    ${{ inputs.description }}
+    DURATION:       ${{ inputs.duration }}
+    ENV_FILE_PATH:  ${{ inputs.env_file_path }}
     ENV_ID:         ${{ inputs.env_id }}
     NAMESPACE:      ${{ inputs.namespace }}
     POOL_NAME:      ${{ inputs.pool_name }}
     POOL_NAMESPACE: ${{ inputs.pool_namespace }}
-    DURATION:       ${{ inputs.duration }}
-    DESCRIPTION:    ${{ inputs.description }}
+    RUN:            ${{ inputs.run }}
+    TRACE:          ${{ inputs.debug }}
   

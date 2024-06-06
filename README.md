@@ -1,11 +1,13 @@
 # GitHub Action for managing shepherd leases
 
-# Usage
+## Usage
+
 This action abstracts claiming and unclaiming shepherd leases.
 
 [.github/workflows/test.yml](.github/workflows/test.yml) provides a good starting point.
 
-# Development
+## Development
+
 1. Open with VisualStudion Code
    - Check if [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension is installed.
 1. Create [.secrets](.secrets) file with real API token.
@@ -14,5 +16,10 @@ This action abstracts claiming and unclaiming shepherd leases.
 1. Open project inside the dev container.
 1. Run `make run` to start.
 
-# Deployment
+## Deployment
+
 1. To upload variables and secrets to the default remote repo for the current branch. **PROCEED WITH CARE** use `make repo-context-setup`. This will overwrite remote vaules with local from [.env](.env) and [.secrets](.secrets)
+
+## ADR
+
+1. Parameter validation happens inside shell script, inputs in [./action.yml] are maximum permissive.
