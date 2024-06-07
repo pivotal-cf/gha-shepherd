@@ -1,5 +1,5 @@
 # GitHub Action for managing shepherd leases
-
+[![.github/workflows/test.yml](https://github.com/a-b/gha-shepherd/actions/workflows/test.yml/badge.svg)](https://github.com/a-b/gha-shepherd/actions/workflows/test.yml)
 ## Usage
 
 This action abstracts claiming and unclaiming shepherd leases.
