@@ -53,9 +53,9 @@ wait_until_env_is_ready() {
   echo "::group::Lease readiness"
   while get_lease > "${ENV_FILE_PATH:?}"; do
     status=$(jq -r .status "${ENV_FILE_PATH:?}")
-    status_msg=$(jq -r .status_msg "${ENV_FILE_PATH:?}" || true )
+    status_message=$(jq -r .status_message "${ENV_FILE_PATH:?}" || true )
     environment=$(jq -r --compact-output '.environment' "${ENV_FILE_PATH:?}")
-    echo "[$(date -u +%Y-%m-%dT%H:%M:%S%Z)] Lease status: ${status:?}: ${status_msg}"
+    echo "[$(date -u +%Y-%m-%dT%H:%M:%S%Z)] Lease status: ${status:?}: ${status_message}"
     echo "::debug:: ${environment}"
     [[ "${TRACE:-0}" == "1" ]] && jq -r 'keys[] as $k | "\n::debug:: \($k): \(.[$k] | tojson)"' lease.json
     case ${status} in
