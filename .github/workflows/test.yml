@@ -1,3 +1,5 @@
+name: Test Workflow
+
 on:
   workflow_dispatch:
   push:
@@ -5,7 +7,7 @@ on:
 
 jobs:
   test:
-    name: Test Workflow
+    name: Demo Typical Usecase
     runs-on: ubuntu-latest
     steps:
       - name: Checkout cli bosh release repo
@@ -21,7 +23,7 @@ jobs:
           namespace:    official
           run: |
             echo "List all available pools"
-            shepherd list pool --namespace "${NAMESPACE:?}"
+            # shepherd list pool --namespace "${NAMESPACE:?}"
             exit 0
             echo "Wont reach to this point"
 
